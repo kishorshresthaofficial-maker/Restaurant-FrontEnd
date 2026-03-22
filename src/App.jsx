@@ -20,6 +20,10 @@ import AdminLayout from '../layouts/AdminLayout'
 
 
 import '@mantine/core/styles.css';
+import Users from './components/admin/Users'
+import Specialitems from './components/admin/Specialitems'
+import Blogs from './components/admin/Blogs'
+import Updatemenu from './components/admin/Updatemenu'
 
 
 
@@ -40,9 +44,13 @@ function App() {
         <Route path="/dashboard" element={<AdminLayout />}>
           <Route index element={<Dashboard />} /> {/* default */}
           <Route path="food-items" element={<Fooditems />} />
+          <Route path='updateMenu/:menuId' element={<Updatemenu/>}></Route>
           <Route path="categories" element={<Addcategories />} />
           <Route path='orders' element={<Orders/>}></Route>
+          <Route path='blogs' element={<Blogs/>}></Route>
+          <Route path='special' element={<Specialitems/>}></Route>
           <Route path='reservations' element={<Reservations/>}></Route>
+          <Route path='admin-users' element={<Users/>}></Route>
         </Route>
 
       </Routes>

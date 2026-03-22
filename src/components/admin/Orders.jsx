@@ -3,6 +3,7 @@ import { useForm } from '@mantine/form';
 import { useDisclosure } from '@mantine/hooks';
 import axios from 'axios';
 import React, { useEffect, useState } from 'react'
+import { Link } from 'react-router';
 
 
 const Orders = () => {
@@ -22,7 +23,7 @@ const Orders = () => {
     validate: {
       name: (value) => (value.length >2 ? null : "Name too short"),
       customer: (value) => (value.length >2 ? null : "Name too short"),
-      // contact: (value) => (value.length >8 ? null : "Enter Valid Contact Number"),
+      contact: (value) => (value.length <8 ?"Enter Valid Contact Number": null) 
       // price: (value) => (value.length >1 ? null : "Enter Valid Price"),
       // status: (value) => (value.length === "" ? null : "Enter Order Status")
 
@@ -30,28 +31,52 @@ const Orders = () => {
     },
   });
 
-
-const handleSubmit=(e)=>{
-  e.preventDefault();
-  const validation = form.validate()
-  if (validation.hasErrors){
-    return;
-  }
-   const res = axios.post("http://localhost:3000/orders/add", form.values)
-   form.reset()
-  //  console.log(res)
-  
-
   const getOrders = async () => {
   const orderList = await axios.get("http://localhost:3000/orders/getOrders");
+  // const orderList = await axios.get("https://restaurant-server-tee7.onrender.com/orders/getOrders");
   setOrders(orderList.data);
 };
+
+const handleSubmit = async (e) => {
+  e.preventDefault();
+
+  const validation = form.validate();
+  if (validation.hasErrors) return;
+
+  try {
+    await axios.post(
+      "http://localhost:3000/orders/add",
+      form.values
+    );
+
+    form.reset();
+    await getOrders();   // wait until updated list comes
+    close();
+  } catch (error) {
+    console.error("Error adding order:", error.response?.data || error.message);
+  }
+};
+
+
+const orderDelete = async(id) => {
+  const confirmDelete = window.confirm("Are you sure to delete this order?");
+  if(!confirmDelete)
+    return;
+  try{
+    await axios.delete(`http://localhost:3000/orders/${id}`);
+    setOrders((prev) => prev.filter((item)=> item._id !==id));
+  }
+  catch(error)
+  {
+    console.log(error)
+  }
+}
 
 useEffect(() => {
   getOrders();
 }, []);
 
-}
+
   return (
     <div className="py-5 px-5 w-full h-dvh bg-gray-100">
       <h1 className="text-2xl font-medium">Orders</h1>
@@ -78,6 +103,7 @@ useEffect(() => {
           <Table.Th>Contact Number</Table.Th>
           <Table.Th>Price</Table.Th>
           <Table.Th>Status</Table.Th>
+          <Table.Th>Action</Table.Th>
         </Table.Tr>
       </Table.Thead>
 
@@ -89,6 +115,9 @@ useEffect(() => {
           <Table.Td>{item.contact}</Table.Td>
           <Table.Td>{item.price}</Table.Td>
           <Table.Td>{item.status}</Table.Td>
+          <Table.Td>
+            <Link onClick={()=> orderDelete(item._id)} className='text-red-600 hover:underline hover:cursor-pointer'>Delete</Link>
+          </Table.Td>
       </Table.Tr>
 ))}
     </Table>
@@ -128,7 +157,7 @@ useEffect(() => {
       data={['On Process', 'Packaging', 'Completed', 'Cancelled']}
       {...form.getInputProps('status')}      
       />
-    <Button type='submit' onClick={close}>Add Order</Button>
+    <Button type='submit' >Add Order</Button>
 
 </form>
 

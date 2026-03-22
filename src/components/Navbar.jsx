@@ -16,7 +16,7 @@ export const Navbar = () => {
             <Link to="/menu" className="links">Menu</Link>
             <Link to="/blogs" className="links">Blogs</Link>
             <Link to="/reservaton" className="links">Reservation</Link>
-            <Link to="/your_cart" className="links">Cart</Link>
+            {/* <Link to="/your_cart" className="links">Cart</Link> */}
             <Link to="/user" className="links p-3 bg-amber-500 text-center text-black rounded-xl font-medium">Customer Portal</Link>
 
           </nav>

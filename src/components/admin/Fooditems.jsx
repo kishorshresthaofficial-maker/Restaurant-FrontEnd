@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from "react";
 import Adminmenu from "./Adminmenu";
-import { Button, Modal, Select, Table } from "@mantine/core";
+import { Button, Modal, NumberInput, Select, Table, TextInput } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { Link, Outlet } from "react-router";
+import { useForm } from "@mantine/form";
 import axios from "axios";
 
 
@@ -11,22 +12,77 @@ const Fooditems = () => {
     const [categories, setCategories] = useState([])
     const [menus, setMenus] = useState([])
 
+    const form = useForm({
+      initialValues: {
+        title: '',
+        image: '',
+        description: '',
+        category: '',
+        price: ''
+      },
+      validate: {
+        title: (value) =>(value.length>2 ? null: "Title too short"),
+        description: (value) => (value.length>5 ? null: "Description too short"),
+        // category: (value) => (value.length>5 ? null: "Enter valid category"),
+        // price: (value) => (value.length>2 ? null: "Enter valid price")
+      },
+    })
+
+
     const getAllCategory = async()=> {
         const categoryResult = await axios.get("http://localhost:3000/category/getCategory");
+        // const categoryResult = await axios.get("https://restaurant-server-tee7.onrender.com/category/getCategory")
         setCategories(categoryResult.data)
     }
 
     const getAllItems = async()=> {
+      
         const menuResult = await axios.get("http://localhost:3000/menu/getItems");
-        setMenus(menuResult.data)
+          //  const menuResult = await axios.get("https://restaurant-server-tee7.onrender.com/menu/getItems")
+           setMenus(menuResult.data)
     }
+
+
+  const handleSubmit = async (e) => {
+  e.preventDefault();
+
+  const validation = form.validate();
+  if (validation.hasErrors) return;
+
+  try {
+    const res = await axios.post(
+      // "https://restaurant-server-tee7.onrender.com/menu/add",
+      "http://localhost:3000/menu/add",
+      form.values
+    );
+
+    console.log(res.data);
+    form.reset();
+    getAllItems(); // refresh table after adding
+    close();       // close modal
+  } catch (error) {
+    console.error("Axios error:", error.response?.data || error.message);
+  }
+};
+
 
     useEffect(()=>{
       getAllCategory()
       getAllItems()
     },[])
 
-    // console.log(categories)
+    
+ const handleDelete = async (id) => {
+  const confirmDelete = window.confirm("Are you sure you want to delete this item?");
+  if (!confirmDelete) return;
+
+  try {
+    await axios.delete(`http://localhost:3000/menu/${id}`);
+    setMenus((prev) => prev.filter((item) => item._id !== id));  // Updates datas from UI without page refresh
+  } catch (error) {
+    console.error(error);
+  }
+};
 
   return (
     <>
@@ -51,7 +107,7 @@ const Fooditems = () => {
                 <Table.Td>Description</Table.Td>
                 <Table.Td>Category</Table.Td>
                 <Table.Td>Price</Table.Td>
-                <Table.Td>Status</Table.Td>
+                {/* <Table.Td>Status</Table.Td> */}
                 <Table.Td>Actions</Table.Td>
               </Table.Tr>
 
@@ -59,21 +115,27 @@ const Fooditems = () => {
                 <Table.Tr>
                   <Table.Td>{item.title}</Table.Td>
                   <Table.Td>{item.description}</Table.Td>
-                  <Table.Td>{item.description}</Table.Td>
+
+                  <Table.Td>{item.category?.name}</Table.Td>
+
                   <Table.Td>{item.price}</Table.Td>
                   <Table.Td>
-                    <Select
-                      placeholder="Select Status"
-                      data={["In Process", "Delivered", "Completed", "Cancelled"]}
-                    />
-                  </Table.Td>
-                  <Table.Td>
-                    <Link to="/editItem" className="hover:underline p-3">
+                    {/* <Link to={`../updateMenu/${item._id}`} className="hover:underline p-3">
                       Edit
-                    </Link>{" "}
-                    <Link to="/deleteItem" className="hover:underline">
-                      Delete
+                    </Link> */}
+                    <Link
+                      to={`/dashboard/updateMenu/${item._id}`}
+                      className="hover:underline p-3"
+                    >
+                      Update
                     </Link>
+
+                    <button
+                      onClick={() => handleDelete(item._id)}
+                      className="text-red-600 hover:underline hover:cursor-pointer"
+                    >
+                      Delete
+                    </button>
                   </Table.Td>
                 </Table.Tr>
               ))}
@@ -85,66 +147,60 @@ const Fooditems = () => {
               title="Add Food Items"
               centered
             >
-              <form className="flex flex-col gap-4 w-full">
-                {/* Food Title */}
-                <div className="flex items-center gap-4 w-full">
-                  <label className="w-32 font-medium">Food Title</label>
-                  <input
-                    type="text"
-                    placeholder="Enter food item title"
-                    className="w-full border rounded px-3 py-2"
-                  />
-                </div>
+              <form onSubmit={(e) => handleSubmit(e)}>
+                <TextInput
+                  label="Food Title"
+                  placeholder="Enter Food Title"
+                  {...form.getInputProps("title")}
+                />
 
-                {/* Image URL */}
-                <div className="flex items-center gap-4 w-full">
-                  <label className="w-32 font-medium">Image URL</label>
-                  <input
-                    type="text"
-                    placeholder="Enter image URL"
-                    className="w-full border rounded px-3 py-2"
-                  />
-                </div>
+                <TextInput
+                  label="Image Url"
+                  placeholder="Enter image url"
+                  {...form.getInputProps("image")}
+                />
+                <TextInput
+                  label="Description"
+                  placeholder="Enter food description"
+                  {...form.getInputProps("description")}
+                />
 
-                {/* Category */}
-                <div className="flex items-center gap-4 w-full">
-                  <label className="w-32 font-medium">Category</label>
-                  <select className="w-75 border rounded px-3 py-2">
+                {/* <select className="w-75 border rounded px-3 py-2">
                     <option value="">Select category</option>
 
                     {categories.map((item, index) => (
                       <option value={item._id}>{item.name}</option>
                     ))}
-                  </select>
-                </div>
+          </select> */}
 
-                <div className="flex items-center gap-4 w-full">
-                  <label className="w-32 font-medium">Price</label>
-                  <input
-                    type="number"
-                    placeholder="Enter Price"
-                    className="w-full border rounded px-3 py-2"
-                  />
-                </div>
+                <select
+                  className="w-75 border rounded px-3 py-2"
+                  {...form.getInputProps("category")}
+                >
+                  <option value="">Select category</option>
 
-                <div className="flex items-center gap-4 w-full">
-                  <label className="w-32 font-medium">Description</label>
-                  <textarea
-                    name="description"
-                    id=""
-                    className="w-75 border rounded"
-                  ></textarea>
-                  {/* <input
-        type="text"
-        placeholder="Enter image URL"
-        className="w-full border rounded px-3 py-2"
-      /> */}
-                </div>
+                  {categories.map((item) => (
+                    <option key={item._id} value={item._id}>
+                      {item.name}
+                    </option>
+                  ))}
+                </select>
 
-                {/* Submit Button */}
-                <div className="flex justify-end pt-3">
-                  <Button type="submit">Add Item</Button>
-                </div>
+                {/* <TextInput label="Category" placeholder="Enter food category" {...form.getInputProps('category')}/> */}
+                <NumberInput
+                  label="Price"
+                  placeholder="Enter price"
+                  {...form.getInputProps("price")}
+                />
+
+                {/* <Select
+                  label="Status"
+                  placeholder="Status"
+                  data={['On Process', 'Packaging', 'Completed', 'Cancelled']}
+                  {...form.getInputProps('status')}      
+                  /> */}
+
+                <Button type="submit">Add Food Item</Button>
               </form>
             </Modal>
           </div>
