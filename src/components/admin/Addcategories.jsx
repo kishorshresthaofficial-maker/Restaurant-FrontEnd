@@ -80,6 +80,7 @@ useEffect(()=>{
 
  <Table striped withColumnBorders>
               <Table.Tr className="text-xl font-medium">
+                <Table.Td>S.N</Table.Td>
                 <Table.Td>Category Name</Table.Td>
                 {/* <Table.Td>Status</Table.Td> */}
                 <Table.Td>Actions</Table.Td>
@@ -87,16 +88,10 @@ useEffect(()=>{
 
               {category.map((item, index) => (
                 <Table.Tr>
+                  <Table.Td>{index+1}</Table.Td>
                   <Table.Td>{item.name}</Table.Td>
-                  {/* <Table.Td> */}
-                    {/* <Group justify="center">
-                      <Switch size="lg" onLabel="Available" offLabel="Not Available"></Switch>
-                    </Group> */}
-                  {/* </Table.Td> */}
-                  <Table.Td>
-                    <Link to="/editItem" className="hover:underline p-3">
-                      Edit
-                    </Link>
+                  <Table.Td className="flex gap-5">
+                    <Link to={`/dashboard/updateCategory/${item._id}`} className="text-green-600 hover:underline hover:cursor-pointer">Update</Link>
                     <Link onClick={() => categoryDelete(item._id)} className="text-red-600 hover:underline hover:cursor-pointer">Delete</Link>
                   </Table.Td>
                 </Table.Tr>

@@ -9,7 +9,7 @@ const AdminLayout = () => {
       <div className="flex gap-10">
       <Adminmenu/>
 
-      <div className="pl-70 py-5 w-full h-dvh bg-gray-100">
+     <div className="pl-70 py-5 w-full min-h-screen bg-gray-200">
         <Outlet/>
       </div>
         

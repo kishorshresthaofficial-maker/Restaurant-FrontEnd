@@ -103,6 +103,7 @@ const Fooditems = () => {
 
             <Table striped withColumnBorders>
               <Table.Tr className="text-xl font-medium">
+                <Table.Td>S.N</Table.Td>
                 <Table.Td>Item Name</Table.Td>
                 <Table.Td>Description</Table.Td>
                 <Table.Td>Category</Table.Td>
@@ -113,6 +114,7 @@ const Fooditems = () => {
 
               {menus.map((item, index) => (
                 <Table.Tr>
+                  <Table.Td>{index + 1}</Table.Td>
                   <Table.Td>{item.title}</Table.Td>
                   <Table.Td>{item.description}</Table.Td>
 
@@ -125,7 +127,7 @@ const Fooditems = () => {
                     </Link> */}
                     <Link
                       to={`/dashboard/updateMenu/${item._id}`}
-                      className="hover:underline p-3"
+                      className="hover:underline p-3 text-green-600"
                     >
                       Update
                     </Link>

@@ -98,6 +98,7 @@ useEffect(() => {
           <Table>
       <Table.Thead>
         <Table.Tr className="text-xl font-medium">
+          <Table.Th>S.N</Table.Th>
           <Table.Th>Item Name</Table.Th>
           <Table.Th>Customer Name</Table.Th>
           <Table.Th>Contact Number</Table.Th>
@@ -110,6 +111,7 @@ useEffect(() => {
 {orders.map((item, index) => (
   // console.log(item)
       <Table.Tr>
+           <Table.Td>{index+1}</Table.Td>
            <Table.Td>{item.name}</Table.Td>
           <Table.Td>{item.customer}</Table.Td>
           <Table.Td>{item.contact}</Table.Td>

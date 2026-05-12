@@ -31,10 +31,11 @@ const Adminmenu = () => {
           </Link>
           <Link to="special" className='dashboard_links'>Chef's Special</Link>
           <Link to="blogs" className='dashboard_links'>Blogs</Link>
-          <Link to="reservations" className="dashboard_links">
-            Reservation
+          <Link to="booking-list" className="dashboard_links">
+            Bookings
           </Link>
-          <Link to="admin-users" className='dashboard_links'>Users</Link>
+          {/* <Link to="admin-users" className='dashboard_links'>Users</Link> */}
+          <Link to ="adminUsers" className='dashboard_links'>Admin Users</Link>
         </div>
 
         <div className="py-30 flex items-start px-3">
